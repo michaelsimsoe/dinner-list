@@ -2,9 +2,10 @@ import config from '../config';
 import { User } from '../resources/user/user.model';
 import jwt from 'jsonwebtoken';
 
+const EXPIRES_IN = 86400000;
 export const newToken = user => {
   return jwt.sign({ id: user.id }, config.secrets.jwt, {
-    expiresIn: config.secrets.jwtExp
+    expiresIn: EXPIRES_IN
   });
 };
 
@@ -24,7 +25,7 @@ export const signup = async (req, res) => {
   try {
     const user = await User.create(req.body);
     const token = newToken(user);
-    return res.status(201).send({ token });
+    return res.status(201).send({ token, expiresIn: EXPIRES_IN });
   } catch (e) {
     return res.status(500).end();
   }
@@ -53,7 +54,7 @@ export const signin = async (req, res) => {
     }
 
     const token = newToken(user);
-    return res.status(201).send({ token });
+    return res.status(201).send({ token, expiresIn: EXPIRES_IN });
   } catch (e) {
     console.error(e);
     res.status(500).end();
